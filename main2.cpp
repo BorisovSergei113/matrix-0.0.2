@@ -38,15 +38,15 @@ void enter_mat(int stroki,int stolbi,float **mat){
     }
 }
 
-int proverka(float **mat1,float **mat2,unsigned int stroki,unsigned int stolbi,unsigned int stroki2,unsigned int stolbi2){
+int proverka(unsigned int stroki,unsigned int stolbi,unsigned int stroki2,unsigned int stolbi2){
     if(stolbi==stolbi2 && stroki==stroki2) return 1;
     else if(stroki==stolbi2) return 0;
     return -1;
 }
 
 float ** plus_mat(float **mat1,float **mat2,unsigned int stroki,unsigned int stolbi,unsigned int stroki2,unsigned int stolbi2){
-    if(proverka( mat1, mat2, stroki,stolbi, stroki2, stolbi2)!=1){
-        
+    if(proverka( stroki,stolbi, stroki2, stolbi2)!=1){
+        cout<<"Error add"<<endl;
         exit(1);
     }
     float **mat3 = create_mat( stroki,stolbi,false);
@@ -60,10 +60,11 @@ float ** plus_mat(float **mat1,float **mat2,unsigned int stroki,unsigned int sto
 
 
 float ** minus_mat(float **mat1,float **mat2,unsigned int stroki,unsigned int stolbi,unsigned int stroki2,unsigned int stolbi2){
-    if(proverka( mat1, mat2, stroki,stolbi, stroki2, stolbi2)!=1){
-        
+    if(proverka( stroki,stolbi, stroki2, stolbi2)!=1){
+        cout<<"Error sub"<<endl;
         exit(1);
     }
+    
     float **mat3 = create_mat( stroki,stolbi,false);
     for(int i=0;i<stroki;i++){
         for(int j=0;j<stolbi;j++){
@@ -74,8 +75,8 @@ float ** minus_mat(float **mat1,float **mat2,unsigned int stroki,unsigned int st
 }
 
 float ** umnog_mat(float **mat1,float **mat2,unsigned int stroki,unsigned int stolbi,unsigned int stroki2,unsigned int stolbi2){
-    if(proverka( mat1, mat2, stroki,stolbi, stroki2, stolbi2)==-1){
-        
+    if(proverka(  stroki,stolbi, stroki2, stolbi2)==-1){
+        cout<<"Error mult"<<endl;
         exit(2);
     }
     float **mat3=create_mat(stroki,stolbi2,false);
@@ -91,15 +92,17 @@ float ** umnog_mat(float **mat1,float **mat2,unsigned int stroki,unsigned int st
 }
 
 
-float ** transp_mat(int stroki,int stolbi,float **mat1){
+float ** transp_mat(unsigned int stroki,unsigned int stolbi,float **mat1){
     float ** mat3= create_mat(stolbi,stroki,false);
     
     for(int i = 0; i<stolbi; i++){
         for(int j = 0; j<stroki; j++){
             mat3[i][j] = mat1[j][i];
         }
+        
     }
     return mat3;
+    
 }
 
 bool issqure(unsigned int stroki,unsigned int stolbi){
@@ -147,7 +150,7 @@ float **obrat(float **mat1,unsigned int stroki,unsigned int stolbi){
         }
         
     }
-    
+    cout<<"There is no reverse matrix"<<endl;
     exit(3);
 }
 
@@ -168,7 +171,7 @@ void Short_Mat(float **mat1,float **p, int i, int j,unsigned int stroki ){
 float opredel(float **mat1,unsigned int stroki){
     int i,d,k,n,j;
     
-    float **p;//mat bez i stroki j stobca
+    float **p;
     p=new float*[stroki];
     for(int i=0;i<stroki;i++){
         p[i]=new float[stroki];
@@ -209,13 +212,36 @@ void del_mem(float **mat,unsigned int stroki,unsigned int stolbi){
 }
 
 void out(float **mat3,unsigned int stroki,unsigned int stolbi){
-    
+    cout<<endl;
     for (int i=0; i<stroki; i++) {
         for (int j=0; j<stolbi; j++) {
+            if(mat3[i][j]==-0){
+                cout<<"0"<<" ";
+            }
+            else{
             cout<<mat3[i][j]<<" ";
+            }
         }
         cout<<endl;
     }
+    del_mem(mat3, stroki, stolbi);
+    
+}
+
+void enter_size(unsigned int& stroki, unsigned int& stolbi)
+{
+    string str;
+    char zap;
+    getline(cin,str);
+    istringstream size(str);
+    if ((size >>stroki) && (size >>zap) && (size >> stolbi) && (zap == ',')&&(size.eof())) {
+        
+    }
+    else
+    {cout<<"An error has occured while reading input data"<<endl;
+        exit(0);
+    }
+    
 }
 
 int main() {
@@ -224,9 +250,7 @@ int main() {
     char op= ' ';
     float **mat1,**mat2;
     
-    scanf("%d%*c%d",&stroki,&stolbi);
-    cin.get();
-    
+    enter_size(stroki,stolbi);
     mat1=create_mat(stroki,stolbi,true);
     
     cin>>op;
@@ -235,38 +259,35 @@ int main() {
     switch (op) {
         case 'T':
             out(transp_mat(stroki,stolbi,mat1),stolbi,stroki);
-            
+            del_mem(mat1,stroki,stolbi);
             break;
         case 'R':
             out(obrat(mat1,stroki,stolbi),stroki,stolbi);
-            
+            del_mem(mat1, stroki, stolbi);
             break;
         case '+':
-            scanf("%d%*c%d",&stroki2,&stolbi2);
-            cin.get();
-            
+            enter_size(stroki2,stolbi2);
             mat2=create_mat(stroki2,stolbi2,true);
             out(plus_mat(mat1,mat2,stroki,stolbi,stroki2,stolbi2),stroki,stolbi);
-            
+            del_mem(mat1, stroki, stolbi);
+            del_mem(mat2, stroki2, stolbi2);
             break;
         case '-':
-            scanf("%d%*c%d",&stroki2,&stolbi2);
-            cin.get();
-            
+            enter_size(stroki2,stolbi2);
             mat2=create_mat(stroki2,stolbi2,true);
             out(minus_mat(mat1,mat2,stroki,stolbi,stroki2,stolbi2),stroki,stolbi);
-            
+            del_mem(mat1, stroki, stolbi);
+            del_mem(mat2, stroki2, stolbi2);
             break;
         case '*':
-            scanf("%d%*c%d",&stroki2,&stolbi2);
-            cin.get();
-            
+            enter_size(stroki2,stolbi2);
             mat2=create_mat(stroki2,stolbi2,true);
             out(umnog_mat(mat1,mat2,stroki,stolbi,stroki2,stolbi2),stroki,stolbi2);
-            
+            del_mem(mat1, stroki, stolbi);
+            del_mem(mat2, stroki2, stolbi2);
             break;
         default:
-            
+            cout<<"An error has occured while reading input data"<<endl;
             break;
     }
     return 0 ;
